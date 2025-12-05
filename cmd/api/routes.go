@@ -19,5 +19,7 @@ func (app *application) routes() http.Handler {
 		w.Write([]byte("Hello world!"))
 	})
 
+	r.Post("/register", app.registerUserHandler)
+
 	return r
 }

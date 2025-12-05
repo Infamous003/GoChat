@@ -5,6 +5,9 @@ import (
 	"log/slog"
 	"os"
 	"time"
+
+	"github.com/Infamous003/GoChat/internal/db"
+	_ "github.com/lib/pq"
 )
 
 type config struct {
@@ -39,6 +42,13 @@ func main() {
 		cfg:    cfg,
 		logger: logger,
 	}
+
+	_, err := db.OpenDB(cfg.db.dsn, cfg.db.maxOpenConns, cfg.db.maxIdleConns, cfg.db.maxIdleTime)
+	if err != nil {
+		logger.Error(err.Error())
+		os.Exit(1)
+	}
+	logger.Info("successfully connected to the database")
 
 	if err := app.serve(); err != nil {
 		logger.Error(err.Error())

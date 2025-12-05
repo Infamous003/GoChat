@@ -1,0 +1,47 @@
+package main
+
+import (
+	"flag"
+	"log/slog"
+	"os"
+	"time"
+)
+
+type config struct {
+	port int
+
+	db struct {
+		dsn          string
+		maxOpenConns int
+		maxIdleConns int
+		maxIdleTime  time.Duration
+	}
+}
+
+type application struct {
+	cfg    config
+	logger *slog.Logger
+}
+
+func main() {
+	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+	var cfg config
+
+	flag.IntVar(&cfg.port, "port", 9090, "API server port")
+	flag.StringVar(&cfg.db.dsn, "db-dsn", os.Getenv("GOCHAT_DSN"), "PostgreSQL DSN")
+	flag.IntVar(&cfg.db.maxOpenConns, "db-max-open-conns", 25, "PostgreSQL max open connections")
+	flag.IntVar(&cfg.db.maxIdleConns, "db-max-idle-conns", 25, "PostgreSQL max idle connections")
+	flag.DurationVar(&cfg.db.maxIdleTime, "db-max-idle-time", 10*time.Minute, "PostgreSQL max connection idle time")
+
+	flag.Parse()
+
+	app := &application{
+		cfg:    cfg,
+		logger: logger,
+	}
+
+	if err := app.serve(); err != nil {
+		logger.Error(err.Error())
+		os.Exit(1)
+	}
+}

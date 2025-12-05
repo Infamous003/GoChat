@@ -11,6 +11,10 @@ func (app *application) routes() http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
+	// Custom error responses
+	r.MethodNotAllowed(app.methodNotAllowedResponse)
+	r.NotFound(app.notfoundResponse)
+
 	r.Get("/hello", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Hello world!"))
 	})

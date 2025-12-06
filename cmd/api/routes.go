@@ -20,6 +20,7 @@ func (app *application) routes() http.Handler {
 	})
 
 	r.Post("/register", app.registerUserHandler)
+	r.Post("/login", app.loginHandler)
 
 	return r
 }

@@ -12,6 +12,7 @@ import (
 
 var (
 	ErrDuplicateUsername = errors.New("duplicate username")
+	ErrRecordNotFound    = errors.New("record not found")
 )
 
 type User struct {
@@ -107,6 +108,30 @@ func (m UserModel) Insert(user *User) error {
 	return nil
 }
 
-// func (m UserModel) GetByUsername(username string) (*User, error) {
+func (m UserModel) GetByUsername(username string) (*User, error) {
+	query := `
+		SELECT id, username, password_hash, created_at, version FROM users
+		WHERE username = $1
+	`
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
 
-// }
+	var user User
+	err := m.DB.QueryRowContext(ctx, query, username).Scan(
+		&user.ID,
+		&user.Username,
+		&user.Password.hash,
+		&user.CreatedAt,
+		&user.Version,
+	)
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return nil, ErrRecordNotFound
+		default:
+			return nil, err
+		}
+	}
+
+	return &user, nil
+}

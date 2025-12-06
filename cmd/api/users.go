@@ -112,7 +112,7 @@ func (app *application) loginHandler(w http.ResponseWriter, r *http.Request) {
 		ID:       strconv.Itoa(int(user.ID)),
 		Username: user.Username,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(1 * time.Minute)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 		},
 	})
 

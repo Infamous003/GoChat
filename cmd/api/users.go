@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -115,8 +114,6 @@ func (app *application) loginHandler(w http.ResponseWriter, r *http.Request) {
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 		},
 	})
-
-	fmt.Printf("%v\n", app.cfg.jwt.secret)
 
 	ss, err := token.SignedString([]byte(app.cfg.jwt.secret))
 	if err != nil {
